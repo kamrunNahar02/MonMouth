@@ -2454,7 +2454,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_rooms';
         $helper->tooltip = $this->l('The total number of rooms in all hotels.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-occupied-rooms';
@@ -2464,7 +2464,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
         $helper->tooltip = $this->l('The current count of rooms that are currently occupied by guests.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-vacant-rooms';
@@ -2474,7 +2474,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=vacant_rooms';
         $helper->tooltip = $this->l('The count of rooms that are currently unoccupied and available for booking.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-reserved-rooms';
@@ -2484,7 +2484,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
         $helper->tooltip = $this->l('The number of rooms that are currently booked but not yet occupied.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-disabled-rooms';
@@ -2494,7 +2494,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_rooms';
         $helper->tooltip = $this->l('The number of rooms that are currently disabled.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-online-bookable-rooms';
@@ -2504,7 +2504,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=online_bookable_rooms';
         $helper->tooltip = $this->l('The total number of rooms that can be booked only using website.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-offline-bookable-rooms';
@@ -2514,7 +2514,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=offline_bookable_rooms';
         $helper->tooltip = $this->l('The number of rooms that can be booked either through website or offline channels (e.g., phone or in-person).', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-best-selling-room-type';
@@ -2525,7 +2525,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysBestSelling);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=best_selling_room_type';
         $helper->tooltip = $this->l('Displays the best selling room type based on the last 30 days of sales.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-disbled-room-types';
@@ -2535,16 +2535,9 @@ class AdminProductsControllerCore extends AdminController
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_room_types';
         $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&productFilter_sa!active=0&submitFilterproduct=1';
         $helper->tooltip = $this->l('The total number of room types that are currently disabled.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
-        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-            'kpis' => &$kpis,
-        ));
-
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-
-        return $helper->generate();
+        return parent::renderKpis();
     }
 
     public function renderList()
