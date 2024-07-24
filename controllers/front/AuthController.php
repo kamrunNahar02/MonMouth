@@ -422,20 +422,20 @@ class AuthControllerCore extends FrontController
 
             $error_phone = false;
             if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
-                if (Tools::isSubmit('submitGuestAccount') || !Tools::getValue('is_new_customer')) {
-                    if (!Tools::getValue('phone') && !Tools::getValue('phone_mobile')) {
-                        $error_phone = true;
-                    }
-                } elseif (((Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && Configuration::get('PS_ORDER_PROCESS_TYPE'))
-                        || (Configuration::get('PS_ORDER_PROCESS_TYPE') && !Tools::getValue('email_create'))
-                        || (Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && Tools::getValue('email_create')))
-                        && (!Tools::getValue('phone') && !Tools::getValue('phone_mobile'))) {
+                if (!Tools::getValue('phone') && !Tools::getValue('phone_mobile')) {
                     $error_phone = true;
                 }
             }
 
             if ($error_phone) {
-                $this->errors[] = Tools::displayError('You must register at least one phone number.');
+                $this->errors[] = Tools::displayError('Phone number is required.');
+            } else {
+                if (Tools::getValue('phone') && !Validate::isPhoneNumber(Tools::getValue('phone'))) {
+                    $this->errors[] = Tools::displayError('Invald phone number.');
+                }
+                if (Tools::getValue('phone_mobile') && !Validate::isPhoneNumber(Tools::getValue('phone_mobile'))) {
+                    $this->errors[] = Tools::displayError('Invald mobile phone number.');
+                }
             }
 
             if (!Tools::getValue('is_new_customer', 1)) {
@@ -468,6 +468,7 @@ class AuthControllerCore extends FrontController
 
                     if (!count($this->errors)) {
                         if ($customer->add()) {
+                            CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, Tools::getValue('phone'));
                             if (!$customer->is_guest) {
                                 if (!$this->sendConfirmationMail($customer)) {
                                     $this->errors[] = Tools::displayError('The email cannot be sent.');
@@ -614,6 +615,10 @@ class AuthControllerCore extends FrontController
                     if (!$customer->save()) {
                         $this->errors[] = Tools::displayError('An error occurred while creating your account.');
                     } else {
+                        // save customer phone number in cart_customer_guest_detail
+                        $phone = Tools::getValue('phone_mobile');
+                        CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $phone);
+
                         foreach ($addresses_types as $addresses_type) {
                             $$addresses_type->id_customer = (int)$customer->id;
                             if ($addresses_type == 'address_invoice') {
