@@ -140,6 +140,12 @@ class AdminAddHotelController extends ModuleAdminController
             $smartyVars['address_info'] = $addressInfo;
             $smartyVars['hotel_info'] = (array) $hotelBranchInfo;
             $smartyVars['link_rewrite_info'] = $objCategory->link_rewrite;
+            $tree = new HelperTreeHotelFeatures('hotel-features-tree', 'Hotel Features');
+            $tree->setUseCheckBox(true)
+                ->setSelectedControllerController('AdminAddHotel')
+                ->setHotelId($hotelBranchInfo->id);
+            $treeContent = $tree->render();
+            $smartyVars['hotel_feature_tree'] = $treeContent;
             //Hotel Images
             $objHotelImage = new HotelImage();
             if ($hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel)) {
@@ -226,6 +232,7 @@ class AdminAddHotelController extends ModuleAdminController
         $longitude = Tools::getValue('loclongitude');
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
+        $hotelFeatures = Tools::getValue('childHotelFeatureBox', array());
 
         // check if field is atleast in default language. Not available in default prestashop
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
@@ -594,6 +601,12 @@ class AdminAddHotelController extends ModuleAdminController
                     $objHotelOrderRestrictDate->preparation_time = $preparationTime;
                 }
                 $objHotelOrderRestrictDate->save();
+
+                $objHotelFeatures = new HotelBranchFeatures();
+                $objHotelFeatures->deleteBranchFeaturesByHotelId($idHotel);
+                if (!$objHotelFeatures->assignFeaturesToHotel($idHotel, $hotelFeatures)) {
+                    $this->errors[] = $this->l('Some problem occurred while assigning Features to the hotel.');
+                }
             }
 
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
