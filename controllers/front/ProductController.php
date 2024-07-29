@@ -766,6 +766,7 @@ class ProductControllerCore extends FrontController
         $demandsPrice = $demandsPricePerRoom * $quantity;
         // calculate total price
         $totalPrice = $totalRoomPrice + $demandsPrice;
+        $totalPriceWithoutDiscount = $objProduct->getPriceWithoutReduct(!$useTax, false, 6, 1) * $numDays * $quantity;
         // send occupancy information searched by the user
         if ($occupancy && is_array($occupancy)) {
             $smartyVars['occupancies'] = $occupancy;
@@ -787,6 +788,7 @@ class ProductControllerCore extends FrontController
         $smartyVars['has_room_type_demands'] = $roomTypeDemands ? true : false; // whether to show price breakup
         $smartyVars['rooms_price'] = $totalRoomPrice;
         $smartyVars['demands_price_per_room'] = $demandsPricePerRoom;
+        $smartyVars['total_price_without_discount'] = $totalPriceWithoutDiscount + $demandsPrice;
         $smartyVars['demands_price'] = $demandsPrice;
         $smartyVars['total_price'] = $totalPrice;
         $this->context->smarty->assign($smartyVars);
